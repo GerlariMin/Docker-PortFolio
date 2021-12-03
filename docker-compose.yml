@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    conteneur_php:
+        image: image_php
+        networks:
+            - network_custom
+        volumes:
+            - ./PortFolioV3:/var/www/
+        restart: always
+    conteneur_apache:
+        image: image_apache
+        depends_on:
+            - conteneur_php
+        ports:
+            - "8080:80"
+        networks:
+            - network_custom
+        volumes:
+            - ./PortFolioV3:/usr/local/apache2/htdocs/
+            - ./conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+        restart: always
+
+networks:
+  network_custom:
+    driver: bridge
