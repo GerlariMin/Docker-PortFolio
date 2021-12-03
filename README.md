@@ -49,7 +49,8 @@ user@host:~# composer update
 # <Directory> blocks below.
 #
 <Directory />
-    AllowOverride all # Remplacer le none par all
+    # Remplacer le none par all
+    AllowOverride all 
     # Enlever, si présent, la ligne Require all denied
 </Directory>
 ```
@@ -59,22 +60,25 @@ user@host:~# composer update
 # is requested.
 #
 <IfModule dir_module>
-    DirectoryIndex index.html index.php # Ajouter le index.php
+    # Ajouter le index.php
+    DirectoryIndex index.html index.php
 </IfModule>
 ```  
 
 ```html
-LoadModule proxy_module modules/mod_proxy.so # Décommenter cette ligne
+# Decommenter cette ligne
+LoadModule proxy_module modules/mod_proxy.so
 ```
 
 ```html
-LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so # Décommenter cette ligne
+# Decommenter cette ligne
+LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so
 ```
 
 ```html
-# Bloc de code à ajouter
+# Bloc de code a ajouter
 <VirtualHost *:80>
-    # Configuration personnalisee pour accéder au conteneur de nom conteneur_php qui va traiter le code PHP
+    # Configuration personnalisee pour acceder au conteneur de nom conteneur_php qui va traiter le code PHP
 	ProxyPassMatch "^/(.*\.php(/.*)?)$" "fcgi://conteneur_php:9000/var/www/" enablereuse=on
 </VirtualHost>
 ```
@@ -86,6 +90,8 @@ LoadModule proxy_fcgi_module modules/mod_proxy_fcgi.so # Décommenter cette lign
 ```dockerfile
 FROM httpd:2.4
 
+RUN rm /usr/local/apache2/htdocs/index.html
+
 COPY ./PortFolioV3/ /usr/local/apache2/htdocs/
 COPY ./conf/httpd.conf /usr/local/apache2/conf/httpd.conf
 ```
@@ -95,14 +101,14 @@ COPY ./conf/httpd.conf /usr/local/apache2/conf/httpd.conf
 ```dockerfile
 FROM php:7.4-fpm
 
+COPY ./PortFolioV3/ /var/www/
+
 RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
     libpng-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd
-    
-COPY ./PortFolioV3/ /var/www/
 ```
 
 ## Création des images
